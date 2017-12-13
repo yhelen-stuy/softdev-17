@@ -10,7 +10,12 @@ var box = document.getElementById("box");
 var boxHeight = box.offsetHeight;
 var boxWidth = box.offsetWidth;
 // Distance mouse can click to considered to have "found" the item
-var threshold = 35;
+var threshold = 50;
+//Jasper's Dumb Stuff
+var disstense = document.getElementsByTagName("h1")[0];
+var thiXway = document.getElementsByTagName("h1")[1];
+var thaYway = document.getElementsByTagName("h1")[2];
+var winnar = 0;
 
 // constants for colors
 // Highest valid RGB value
@@ -34,6 +39,7 @@ console.log( "box width: " + boxWidth );
 
 // Randomly set the target in the box
 var setTarget = function() {
+    winnar = 0;
     targetX = Math.floor(Math.random() * boxWidth);
     targetY = Math.floor(Math.random() * boxHeight);
     // console.log( "target height: " + targetX);
@@ -53,6 +59,7 @@ var farthestDistance = function() {
 var distance = function (x0, y0, x1, y1) {
     // console.log(x1 - x0);
     // console.log(y1 - y0);
+  
     return Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
 };
 
@@ -60,9 +67,15 @@ var distance = function (x0, y0, x1, y1) {
 // If found print to console to indicate and reset the target
 // Otherwise, tell them they haven't found it
 var found = function(e) {
-    if (distance(e.x, e.y, targetX, targetY) < threshold) {
+    if ( winnar == 1 ){
+	setTarget();
+	console.log(winnar);
+    }
+    else if (distance(e.x, e.y, targetX, targetY) < threshold) {
+	winnar = 1;
+	console.log(winnar);
         console.log("CONGRATS!");
-        setTarget();
+	
     } else {
         console.log("try again");
     }
@@ -71,17 +84,29 @@ var found = function(e) {
 // Sets the color values using the proprtion of the color values, the distance
 // to the target, and the farthest distance possible.
 var findIt = function(e) {
+    if( winnar == 1) {
+	disstense.innerHTML = "";
+	thiXway.innerHTML = "";
+	thaYway.innerHTML = "";
+	    
+	box.style.backgroundImage = "url('https://jamonkey.com/wp-content/uploads/2015/06/DSC00112.jpg')";
+    }else{
     var farthest = farthestDistance();
     var dist = distance(e.x, e.y, targetX, targetY);
+    disstense.innerHTML = "Distance: " + dist;
+    thiXway.innerHTML = "X: " + e.x;
+    thaYway.innerHTML = "Y: " + e.y;
 
     // var rgbColor = MAXRGB - Math.round(MAXRGB * dist / farthest);
     // var rgb = "rgb(" + rgbColor + "," + rgbColor + "," + rgbColor + ")";
     var sat = Math.round(MAXSAT * dist / farthest);
     var lightness = MAXLIGHTNESS - Math.round(MINLIGHTNESS * dist / farthest);
     var hsl = "hsl(" + HUE + "," + sat + "%," + lightness + "%)";
-    box.setAttribute("style","background-color: " + hsl);
+	box.setAttribute("style","background-color: " + hsl);
+    }
 };
 
 setTarget();
 box.addEventListener("mousemove", findIt);
 box.addEventListener("click", found);
+
